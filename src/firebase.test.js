@@ -2,11 +2,14 @@ import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  connectAuthEmulator 
+  connectAuthEmulator, 
+  signInAnonymously 
 } from "firebase/auth";
 import { 
   getFirestore, 
-  connectFirestoreEmulator 
+  connectFirestoreEmulator, 
+  doc, 
+  setDoc 
 } from "firebase/firestore";
 
 // Configuración para pruebas (emuladores)
@@ -49,14 +52,26 @@ describe('Firebase Initialization Tests', () => {
     expect(googleProvider.getCustomParameters()).toEqual({ prompt: 'select_account' });
   });
 
-  it('should connect to Firebase Auth emulator', () => {
-    const authUrl = auth.config.apiEndpoint; // Verifica si la URL del emulador está configurada
-    expect(authUrl).toBe('http://localhost:9099'); 
+  it('should connect to Firebase Auth emulator by signing in anonymously', async () => {
+    try {
+      const userCredential = await signInAnonymously(auth);
+      expect(userCredential).toBeDefined();
+      expect(userCredential.user).toBeDefined();
+      expect(userCredential.user.uid).toBeDefined();
+    } catch (error) {
+      fail('Failed to sign in with Firebase Auth emulator: ' + error.message);
+    }
   });
 
-  it('should connect to Firestore emulator', () => {
-    const firestoreHost = db._delegate.host; // Verifica la configuración del emulador
-    expect(firestoreHost).toContain('localhost');
-    expect(firestoreHost).toContain('8080');
+  it('should connect to Firestore emulator by writing and reading data', async () => {
+    try {
+      const testDocRef = doc(db, "testCollection", "testDoc");
+      await setDoc(testDocRef, { test: "data" });
+      const docSnapshot = await testDocRef.get();
+      expect(docSnapshot.exists()).toBe(true);
+      expect(docSnapshot.data().test).toBe("data");
+    } catch (error) {
+      fail('Failed to interact with Firestore emulator: ' + error.message);
+    }
   });
 });
