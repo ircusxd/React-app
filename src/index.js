@@ -1,24 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
-import Homepage from './Pages/Homepage';
 import Navbar from './Components/Navbar';
-import Fieldspage from './Pages/Fieldspage';
-import FieldDetailpage from './Pages/FieldDetailpage';
-import ChatPage from './Pages/ChatPage';
-
-const AppRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Homepage />} />
-      <Route path="/fields" element={<Fieldspage />} />
-      <Route path="/field/:fieldId" element={<FieldDetailpage />} />
-      <Route path="/chat" element={<ChatPage />} />
-    </Routes>
-  );
-};
+import AppRoutes from './AppRoutes';
 
 ReactDOM.render(
   <React.StrictMode>
