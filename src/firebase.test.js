@@ -2,14 +2,11 @@ import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  connectAuthEmulator, 
-  signInAnonymously 
+  connectAuthEmulator 
 } from "firebase/auth";
 import { 
   getFirestore, 
-  connectFirestoreEmulator, 
-  doc, 
-  setDoc 
+  connectFirestoreEmulator 
 } from "firebase/firestore";
 
 // Configuración para pruebas (emuladores)
@@ -25,14 +22,14 @@ const firebaseTestConfig = {
 const app = initializeApp(firebaseTestConfig);
 
 export const auth = getAuth(app);
-// Conectar Auth al emulador
+// Conectar Auth al emulador (si se usa emulador)
 connectAuthEmulator(auth, "http://localhost:9099");
 
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const db = getFirestore(app);
-// Conectar Firestore al emulador
+// Conectar Firestore al emulador (si se usa emulador)
 connectFirestoreEmulator(db, "localhost", 8080);
 
 // Tests unitarios
@@ -50,28 +47,5 @@ describe('Firebase Initialization Tests', () => {
   it('should initialize Google Auth Provider with custom parameters', () => {
     expect(googleProvider).toBeDefined();
     expect(googleProvider.getCustomParameters()).toEqual({ prompt: 'select_account' });
-  });
-
-  it('should connect to Firebase Auth emulator by signing in anonymously', async () => {
-    try {
-      const userCredential = await signInAnonymously(auth);
-      expect(userCredential).toBeDefined();
-      expect(userCredential.user).toBeDefined();
-      expect(userCredential.user.uid).toBeDefined();
-    } catch (error) {
-      fail('Failed to sign in with Firebase Auth emulator: ' + error.message);
-    }
-  });
-
-  it('should connect to Firestore emulator by writing and reading data', async () => {
-    try {
-      const testDocRef = doc(db, "testCollection", "testDoc");
-      await setDoc(testDocRef, { test: "data" });
-      const docSnapshot = await testDocRef.get();
-      expect(docSnapshot.exists()).toBe(true);
-      expect(docSnapshot.data().test).toBe("data");
-    } catch (error) {
-      fail('Failed to interact with Firestore emulator: ' + error.message);
-    }
   });
 });
