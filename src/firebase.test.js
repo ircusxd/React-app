@@ -22,14 +22,14 @@ const firebaseTestConfig = {
 const app = initializeApp(firebaseTestConfig);
 
 export const auth = getAuth(app);
-// Conectar Auth al emulador (si se usa emulador)
+// Conectar Auth al emulador
 connectAuthEmulator(auth, "http://localhost:9099");
 
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const db = getFirestore(app);
-// Conectar Firestore al emulador (si se usa emulador)
+// Conectar Firestore al emulador
 connectFirestoreEmulator(db, "localhost", 8080);
 
 // Tests unitarios
@@ -47,5 +47,16 @@ describe('Firebase Initialization Tests', () => {
   it('should initialize Google Auth Provider with custom parameters', () => {
     expect(googleProvider).toBeDefined();
     expect(googleProvider.getCustomParameters()).toEqual({ prompt: 'select_account' });
+  });
+
+  it('should connect to Firebase Auth emulator', () => {
+    const authUrl = auth.config.apiEndpoint; // Verifica si la URL del emulador está configurada
+    expect(authUrl).toBe('http://localhost:9099'); 
+  });
+
+  it('should connect to Firestore emulator', () => {
+    const firestoreHost = db._delegate.host; // Verifica la configuración del emulador
+    expect(firestoreHost).toContain('localhost');
+    expect(firestoreHost).toContain('8080');
   });
 });
